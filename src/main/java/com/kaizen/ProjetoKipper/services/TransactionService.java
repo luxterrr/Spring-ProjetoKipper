@@ -32,7 +32,9 @@ public class TransactionService {
     public Transaction createTransaction(TransactionDTO transaction) throws Exception {
         User sender = this.userService.findUserById(transaction.senderId());
         User receiver = this.userService.findUserById(transaction.receiverId());
+
         userService.validateTransaction(sender, transaction.value());
+
         boolean isAuthorized = this.authorizeTransaction(sender, transaction.value());
 
         if (!isAuthorized) {
@@ -54,7 +56,6 @@ public class TransactionService {
 
         this.notificationService.sendNotification(sender , "TRANSACAO ENVIADA COM SUCESSO");
         this.notificationService.sendNotification(receiver , "TRANSACAO RECEBIDA COM SUCESSO");
-
 
         return newTransaction;
     }
