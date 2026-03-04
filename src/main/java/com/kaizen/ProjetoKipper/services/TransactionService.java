@@ -1,8 +1,8 @@
 package com.kaizen.ProjetoKipper.services;
 
 import com.kaizen.ProjetoKipper.DTOS.TransactionDTO;
-import com.kaizen.ProjetoKipper.Users.Transaction;
-import com.kaizen.ProjetoKipper.Users.User;
+import com.kaizen.ProjetoKipper.Domains.Transacao.Transaction;
+import com.kaizen.ProjetoKipper.Domains.Users.User;
 import com.kaizen.ProjetoKipper.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,10 @@ public class TransactionService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public void createTransaction(TransactionDTO transaction) throws Exception {
+    @Autowired
+    private NotificationService notificationService;
+
+    public Transaction createTransaction(TransactionDTO transaction) throws Exception {
         User sender = this.userService.findUserById(transaction.senderId());
         User receiver = this.userService.findUserById(transaction.receiverId());
         userService.validateTransaction(sender, transaction.value());
@@ -48,14 +51,25 @@ public class TransactionService {
         this.repository.save(newTransaction);
         this.userService.saveUser(sender);
         this.userService.saveUser(receiver);
+
+        this.notificationService.sendNotification(sender , "TRANSACAO ENVIADA COM SUCESSO");
+        this.notificationService.sendNotification(receiver , "TRANSACAO RECEBIDA COM SUCESSO");
+
+
+        return newTransaction;
     }
 
     public boolean authorizeTransaction(User sender, BigDecimal value) {
-        ResponseEntity<Map> authorizationResponse  =restTemplate.getForEntity("http://util.devi.tools/api/v2/authorize", Map.class);
+        try {
+            ResponseEntity<Map> authorizationResponse = restTemplate.getForEntity("https://util.devi.tools/api/v2/authorize", Map.class);
 
-        if (authorizationResponse.getStatusCode() == HttpStatus.OK) {
-            String message = (String) authorizationResponse.getBody().get("message");
-            return "Autorizado" .equalsIgnoreCase(message);
-        } else return false;
+            if (authorizationResponse.getStatusCode() == HttpStatus.OK) {
+                // Ajuste aqui para o novo formato da API se necessário
+                return true;
+            }else{ return false;}
+        } catch (Exception exception) {
+            // Se cair aqui (ex: 403 Forbidden), a transação não é autorizada
+            return false;
+        }
     }
 }

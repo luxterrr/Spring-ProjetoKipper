@@ -1,5 +1,6 @@
-package com.kaizen.ProjetoKipper.Users;
+package com.kaizen.ProjetoKipper.Domains.Transacao;
 
+import com.kaizen.ProjetoKipper.Domains.Users.User;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package com.kaizen.ProjetoKipper.Users;
+package com.kaizen.ProjetoKipper.Domains.Users;
 
 public enum UserType {
     COMMON,

@@ -1,6 +1,7 @@
-package com.kaizen.ProjetoKipper.Users;
+package com.kaizen.ProjetoKipper.Domains.Users;
 
 
+import com.kaizen.ProjetoKipper.DTOS.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,5 +32,17 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserType userType;
+
+    private String password;
+
+    public User(UserDTO data){
+        this.firstName = data.firstName();
+        this.lastName = data.lastName();
+        this.balance = data.balance();
+        this.password = data.password();
+        this.document = data.document();
+        this.email = data.email();
+        this.userType = data.userType();
+    }
 
 }
